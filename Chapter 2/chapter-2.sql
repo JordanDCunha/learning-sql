@@ -1,6 +1,13 @@
 -- Chapter 2: ALTER TABLE and Constraints
 -- SQL Server Syntax
 
+DROP TABLE IF EXISTS Employees;
+
+CREATE TABLE Employees (
+    ID INTEGER PRIMARY KEY,
+    FName TEXT NOT NULL,
+    Salary INTEGER
+);
 ALTER TABLE Employees
 ADD StartingDate DATE NOT NULL DEFAULT GETDATE(),
     DateOfBirth DATE NULL;
