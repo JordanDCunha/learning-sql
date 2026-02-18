@@ -1,0 +1,25 @@
+-- Chapter 2: ALTER TABLE and Constraints
+-- SQL Server Syntax
+
+ALTER TABLE Employees
+ADD StartingDate DATE NOT NULL DEFAULT GETDATE(),
+    DateOfBirth DATE NULL;
+
+ALTER TABLE Employees
+DROP COLUMN Salary;
+
+ALTER TABLE Employees
+ADD CONSTRAINT DefaultSalary
+DEFAULT (100) FOR Salary;
+
+ALTER TABLE Employees
+DROP CONSTRAINT DefaultSalary;
+
+ALTER TABLE Employees
+ALTER COLUMN StartingDate DATETIME NOT NULL DEFAULT (GETDATE());
+
+ALTER TABLE Employees
+ADD CONSTRAINT pk_EmployeeID PRIMARY KEY (ID);
+
+ALTER TABLE Employees
+ADD CONSTRAINT pk_EmployeeID PRIMARY KEY (ID, FName);
