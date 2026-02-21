@@ -1,67 +1,182 @@
-✅ Chapter 39: NULL — Study Guide										
-										
-📘 Purpose		"In SQL, NULL represents “nothing” — the absence of any value.
+# Chapter 39: NULL — Study Guide
+
+## 📘 Purpose
+
+In SQL, **NULL** represents “nothing” — the absence of any value.
 
 ⚠️ Important distinctions:
 
-NULL ≠ empty string ('')
+- NULL ≠ empty string (`''`)
+- NULL ≠ number `0`
+- Do NOT write `'NULL'` in quotes — that becomes text, not NULL.
 
-NULL ≠ number 0
+---
 
-Do not write 'NULL' in quotes — that is treated as text, not NULL."					🧩 Key Characteristics			
-⚙️ Filtering for NULL		"-- Select rows where ManagerId is NULL
-SELECT * FROM Employees
+# 🧩 Key Characteristics
+
+| Concept | Description |
+|----------|------------|
+| Meaning | Absence of a value |
+| Comparison | Cannot use `=` or `<>` with NULL |
+| Default Behavior | Columns are nullable unless specified `NOT NULL` |
+| Use Case | Represent missing or optional data |
+
+---
+
+# ⚙️ Filtering for NULL
+
+```sql
+-- Select rows where ManagerId is NULL
+SELECT * 
+FROM Employees
 WHERE ManagerId IS NULL;
 
 -- Select rows where ManagerId is NOT NULL
+SELECT * 
+FROM Employees
+WHERE ManagerId IS NOT NULL;
+```
+
+### 💡 Explanation
+
+| Clause | Description |
+|----------|------------|
+| `IS NULL` | Filters rows where column has no value |
+| `IS NOT NULL` | Filters rows where column contains a value |
+| `= NULL` or `<> NULL` | ❌ Always returns UNKNOWN |
+
+---
+
+# 🧠 Why `= NULL` Does NOT Work
+
+```sql
+-- ❌ Incorrect
 SELECT * FROM Employees
-WHERE ManagerId IS NOT NULL;"			"💡 Explanation:
-| Clause                | Description                                    |
-| --------------------- | ---------------------------------------------- |
-| `IS NULL`             | Filters rows where the column has no value     |
-| `IS NOT NULL`         | Filters rows where the column contains a value |
-| `= NULL` or `<> NULL` | ❌ Not allowed — always returns UNKNOWN         |
-"		Concept	Description		
-⚙️ Nullable vs Non-Nullable Columns		"CREATE TABLE MyTable (
+WHERE ManagerId = NULL;
+```
+
+Reason:
+
+- NULL represents unknown.
+- Any comparison with NULL results in UNKNOWN.
+- SQL uses three-valued logic: TRUE, FALSE, UNKNOWN.
+
+---
+
+# ⚙️ Nullable vs Non-Nullable Columns
+
+```sql
+CREATE TABLE MyTable (
     MyCol1 INT NOT NULL,  -- cannot store NULL
     MyCol2 INT NULL       -- can store NULL
 );
 
--- Works fine
-INSERT INTO MyTable (MyCol1, MyCol2) VALUES (1, NULL);
+-- Works
+INSERT INTO MyTable (MyCol1, MyCol2)
+VALUES (1, NULL);
 
--- ❌ Fails: cannot insert NULL into non-nullable column
-INSERT INTO MyTable (MyCol1, MyCol2) VALUES (NULL, 2);
-"			"💡 Explanation:
+-- ❌ Fails
+INSERT INTO MyTable (MyCol1, MyCol2)
+VALUES (NULL, 2);
+```
 
-NOT NULL ensures column must always have a value.
+### 💡 Explanation
 
-NULL allows optional or missing data.
+- `NOT NULL` ensures column must always have a value.
+- `NULL` allows optional or missing data.
+- Default: Columns are nullable unless explicitly set `NOT NULL`.
 
-Default: Columns are nullable unless explicitly set to NOT NULL."		Meaning	Absence of a value		
-⚙️ Updating Fields to NULL		"-- Set ManagerId to NULL for employee with Id = 4
+---
+
+# ⚙️ Updating Fields to NULL
+
+```sql
 UPDATE Employees
 SET ManagerId = NULL
-WHERE Id = 4;"			"💡 Explanation:
+WHERE Id = 4;
+```
 
-Updating a column to NULL works like updating any other value."		Comparison	NULL cannot be compared using = or <> (always UNKNOWN)		
-⚙️ Inserting Rows with NULL Fields		"INSERT INTO Employees
+💡 Updating to NULL works like updating any other value — if the column allows NULL.
+
+---
+
+# ⚙️ Inserting Rows with NULL Fields
+
+```sql
+INSERT INTO Employees
 (Id, FName, LName, PhoneNumber, ManagerId, DepartmentId, Salary, HireDate)
 VALUES
-(5, 'Jane', 'Doe', NULL, NULL, 2, 800, '2016-07-22');"			"💡 Explanation:
+(5, 'Jane', 'Doe', NULL, NULL, 2, 800, '2016-07-22');
+```
 
-Columns like PhoneNumber or ManagerId can remain empty (NULL) if no data is available.
+### 💡 Explanation
 
-Useful for optional fields or unknown information."		Default Behavior	Columns are nullable by default unless NOT NULL is specified		
-							Use Case	Represent missing or optional data (e.g., no manager, unknown phone number)		
-										
-							⚡ Key Points			
-							Concept	Summary		
-							NULL is absence of value	Not 0, not empty string, not 'NULL'		
-							Comparisons	Use IS NULL or IS NOT NULL		
-							Column constraints	NOT NULL prevents NULLs; default is nullable		
-							Insertion & Update	Can insert or update columns to NULL where allowed		
-										
-										
-										
-										
+- Optional fields (e.g., PhoneNumber, ManagerId) can be NULL.
+- Useful when information is unknown or not applicable.
+
+---
+
+# ⚡ NULL in Expressions
+
+```sql
+SELECT Salary + NULL FROM Employees;
+```
+
+Result: NULL
+
+Any arithmetic or string operation involving NULL returns NULL.
+
+---
+
+# ⚙️ Handling NULL with Functions
+
+### Use `COALESCE()` (All Major DBs)
+
+```sql
+SELECT COALESCE(ManagerId, 0)
+FROM Employees;
+```
+
+Returns first non-NULL value.
+
+---
+
+### SQL Server Only: `ISNULL()`
+
+```sql
+SELECT ISNULL(ManagerId, 0)
+FROM Employees;
+```
+
+---
+
+### MySQL Only: `IFNULL()`
+
+```sql
+SELECT IFNULL(ManagerId, 0)
+FROM Employees;
+```
+
+---
+
+# ⚡ Key Points Summary
+
+| Concept | Summary |
+|----------|----------|
+| NULL | Absence of value |
+| Not equal to | 0, empty string, or 'NULL' |
+| Comparison | Must use `IS NULL` or `IS NOT NULL` |
+| Column Constraint | `NOT NULL` prevents NULL values |
+| Expressions | Operations with NULL return NULL |
+| Use Case | Missing or optional data |
+
+---
+
+# 🧠 Final Reminder
+
+Always remember:
+
+- NULL means unknown.
+- Unknown cannot be compared using `=`.
+- Use proper NULL-handling functions when needed.
+- Design schemas carefully to avoid unnecessary NULLs.
